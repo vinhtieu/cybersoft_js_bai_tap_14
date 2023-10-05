@@ -1,8 +1,8 @@
 import axios from "axios";
 import { USER_DATA } from "../api";
-import { GET_USERS } from "../constant/cases";
+import { GET_USER, FETCH_USERS, CREATE_USER } from "../constant/cases";
 
-export const getUsers = () => {
+export const fetchUsers = () => {
   return (dispatch) => {
     axios({
       url: USER_DATA,
@@ -10,16 +10,25 @@ export const getUsers = () => {
     })
       .then((res) => {
         let action = {
-          type: GET_USERS,
+          type: FETCH_USERS,
           payload: res.data,
         };
-
-        console.log("res.data: ", res.data);
 
         dispatch(action);
       })
       .catch((err) => {
-        throw new Error("Something bad happened.");
+        throw new Error(err);
       });
+  };
+};
+
+export const getUser = (key, value) => {
+  return (dispatch) => {
+    let action = {
+      type: GET_USER,
+      payload: { key, value },
+    };
+
+    dispatch(action);
   };
 };
