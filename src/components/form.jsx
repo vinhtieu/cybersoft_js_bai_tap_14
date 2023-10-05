@@ -23,7 +23,8 @@ class Form extends Component {
       data: user,
     })
       .then(() => {
-        this.formRef.current.reset();
+        this.formReset();
+        this.focusUsername();
         this.props.handleFetchUser();
       })
       .catch((err) => {});
@@ -99,8 +100,6 @@ class Form extends Component {
             type="button"
             className="btn btn-primary"
             onClick={() => {
-              this.formReset();
-              this.focusUsername();
               this.createUser(this.props.user);
             }}>
             Create
