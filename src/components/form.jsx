@@ -1,11 +1,11 @@
 import React, { Component, createRef } from "react";
-import { getUser, fetchUsers } from "../services/action/action";
+import { resetUser, getUser, fetchUsers } from "../services/action/action";
 import { connect } from "react-redux";
 import { USER_DATA } from "../services/api";
+import { message } from "antd";
 import axios from "axios";
 
 class Form extends Component {
-  formRef = createRef();
   usernameRef = createRef();
 
   componentDidMount = () => {
@@ -23,27 +23,45 @@ class Form extends Component {
       data: user,
     })
       .then(() => {
-        this.formReset();
         this.focusUsername();
-        this.props.handleFetchUser();
+        this.props.handleResetForm();
+        this.props.handleGetDataFromServer();
       })
       .catch((err) => {});
   };
 
-  formReset = () => {
-    this.formRef.current.reset();
+  updateUser = (id, user) => {
+    const api = USER_DATA + `/${id}`;
+    axios({
+      url: api,
+      method: "PUT",
+      data: user,
+    })
+      .then(() => {
+        this.focusUsername();
+        this.props.handleResetForm();
+        this.props.handleGetDataFromServer();
+      })
+      .catch((err) => {
+        throw new Error("Something bad happened.");
+      });
   };
 
   focusUsername = () => {
     this.usernameRef.current.focus();
   };
 
-  render() {
-    let { username, email, password } = this.props.user;
+  showMessage = (text) => {
+    message.success(text);
+  };
 
+  render() {
+    let { username, email, password, id } = this.props.user;
+
+    console.log("isEdit: ", this.props.isEdit);
     return (
       <div>
-        <form ref={this.formRef}>
+        <form>
           <div className="mb-3">
             <label htmlFor="username" className="form-label">
               Username
@@ -96,14 +114,40 @@ class Form extends Component {
             />
           </div>
 
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => {
-              this.createUser(this.props.user);
-            }}>
-            Create
-          </button>
+          <div style={{ display: "flex", flexDirection: "row" }}>
+            <button
+              disabled={this.props.isEdit ? true : false}
+              type="button"
+              className="btn btn-primary"
+              style={{ marginRight: "16px" }}
+              onClick={() => {
+                this.createUser(this.props.user);
+                this.showMessage("Success");
+              }}>
+              Create
+            </button>
+            <button
+              disabled={this.props.isEdit ? false : true}
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                this.updateUser(id, this.props.user);
+                this.showMessage("Update");
+              }}>
+              Update
+            </button>
+            <button
+              type="button"
+              style={{ marginLeft: "auto" }}
+              className="btn btn-danger"
+              onClick={() => {
+                this.focusUsername();
+                this.props.handleResetForm();
+                this.showMessage("Reset");
+              }}>
+              Reset
+            </button>
+          </div>
         </form>
       </div>
     );
@@ -113,15 +157,19 @@ class Form extends Component {
 let mapStateToProps = (state) => {
   return {
     user: state.userReducer.user,
+    isEdit: state.userReducer.isEdit,
   };
 };
 
 let mapDispatchToProps = (dispatch) => {
   return {
+    handleResetForm: () => {
+      dispatch(resetUser());
+    },
     handleUserInfo: (key, value) => {
       dispatch(getUser(key, value));
     },
-    handleFetchUser: () => {
+    handleGetDataFromServer: () => {
       dispatch(fetchUsers());
     },
   };

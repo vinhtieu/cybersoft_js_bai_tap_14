@@ -1,6 +1,6 @@
 import axios from "axios";
 import { USER_DATA } from "../api";
-import { GET_USER, FETCH_USERS, CREATE_USER } from "../constant/cases";
+import { GET_USER, FETCH_USERS, SET_USER, RESET_USER } from "../constant/cases";
 
 export const fetchUsers = () => {
   return (dispatch) => {
@@ -29,6 +29,26 @@ export const getUser = (key, value) => {
       payload: { key, value },
     };
 
+    dispatch(action);
+  };
+};
+
+export const setUser = (user) => {
+  return (dispatch) => {
+    let action = {
+      type: SET_USER,
+      payload: user,
+    };
+
+    dispatch(action);
+  };
+};
+
+export const resetUser = () => {
+  return (dispatch) => {
+    let action = {
+      type: RESET_USER,
+    };
     dispatch(action);
   };
 };

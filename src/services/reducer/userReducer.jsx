@@ -1,9 +1,9 @@
 import {
   CREATE_USER,
-  UPDATE_USER,
-  DELETE_USER,
   FETCH_USERS,
   GET_USER,
+  SET_USER,
+  RESET_USER,
 } from "../constant/cases";
 
 const initialState = {
@@ -13,6 +13,8 @@ const initialState = {
     email: "",
     password: "",
   },
+
+  isEdit: false,
 };
 
 const userReducer = (state = initialState, { type, payload }) => {
@@ -33,15 +35,29 @@ const userReducer = (state = initialState, { type, payload }) => {
 
     case FETCH_USERS:
       return { ...state, userList: payload };
+
     case GET_USER:
       const { key, value } = payload;
       const newProps = { ...state.user, [key]: value };
       return { ...state, user: newProps };
 
-    case UPDATE_USER:
-      return { ...state, ...payload };
-    case DELETE_USER:
-      return { ...state, ...payload };
+    case SET_USER:
+      return {
+        ...state,
+        user: payload,
+        isEdit: true,
+      };
+
+    case RESET_USER:
+      return {
+        ...state,
+        user: {
+          username: "",
+          email: "",
+          password: "",
+        },
+        isEdit: false,
+      };
 
     default:
       return state;
